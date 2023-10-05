@@ -20,29 +20,21 @@
 # time requirements
 #SBATCH --time=12:00:00
 
+# add partition
+#SBATCH --account=b1042
+#SBATCH --partition=genomics
+
 # launch executable script
 compress=false
-while getopts d:g:m:c option
+while getopts d:g: option
 do
     case "$option" in
         d) dirData=$OPTARG;;
         g) genome=$OPTARG;;
-	m) mateLength=$OPTARG;;
-	c) compress=true;;
     esac
 done
 
 cmd="bash genomeGenerate.sh -d $dirData -g $genome"
-
-if [[ ! -z $mateLength ]]
-then
-    cmd="$cmd -m $mateLength"
-fi
-
-if $compress
-then
-    cmd="$cmd -c"
-fi
 
 # echo $cmd
 eval $cmd

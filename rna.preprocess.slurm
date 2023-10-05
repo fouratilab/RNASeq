@@ -7,41 +7,55 @@
 #SBATCH --mail-type=END,FAIL
 
 # name of job
-#SBATCH --job-name=mrna.nonhost_%a
+#SBATCH --job-name=rna.pre_%a
 
 # standard output file
-#SBATCH --output=mrna.nonhost_%a.out
+#SBATCH --output=rna.pre_%a.out
 
 # number of nodes and processors, memory required
-#SBATCH --tasks=1
-#SBATCH --mem=256gb
-#SBATCH --partition=smp
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32gb
+#SBATCH --exclusive
 
 # time requirements
-#SBATCH --time=72:00:00
+#SBATCH --time=48:00:00
 
 # dependencies
-#SBATCH --depend=afterok:SLURM_JOB_ID
+#SBATCH --depend=afterok:$SLURM_JOB_ID
 
 # create array
 #SBATCH --array=1-BATCH
 
+# add partition
+#SBATCH --account=b1042
+#SBATCH --partition=genomics
+
 # initialize directories
 pairEnd=false
-while getopts d:p option
+isoform=false
+while getopts d:g:pi option
 do
     case "$option" in
         d) dirData=$OPTARG;;
+        g) genome=$OPTARG;;
 	p) pairEnd=true;;
+	i) isoform=true;;
     esac
 done
 
 # launch executable script
-cmd="bash mRNA.nonHost_seq.sh -d $dirData/raw$SLURM_ARRAY_TASK_ID"
+cmd="bash rna.preprocess_seq.sh -d $dirData"
+cmd="$cmd -g $genome"
 
 if $pairEnd
 then
     cmd="$cmd -p"
+fi
+
+if $isoform
+then
+    cmd="$cmd -i"
 fi
 
 # echo $cmd

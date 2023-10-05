@@ -1,57 +1,40 @@
 #!/bin/bash
-# @author Slim Fourati (sxf279@case.edu)
-# @author Aarthi Talla (axt427@case.edu)
-# @version 0.5
+# @author Slim Fourati (slim.fourati@northwestern.edu)
+# @version 1.0
 
 # load apps
-module load STAR/2.7.0e
+module load STAR/2.7.9a
 
 # read input arguments
 compress=false
-while getopts d:g:m:c option
+while getopts d:g: option
 do
     case "${option}" in
 	d) dirData=$OPTARG;;
 	g) genome=$OPTARG;;
-	m) mateLength=$OPTARG;;
-	c) compress=true;;
     esac
 done
 
 # set global variables for the script
-bin="/mnt/rstor/SOM_PATH_RXS745U/bin"
-genomeDir="/mnt/rstor/SOM_PATH_RXS745U/genome/${genome}"
+genomeDir="/projects/b1042/FouratiLab/genome/${genome}"
 genomeFasta="$genomeDir/Sequence/genome.fa"
 gtfFile="$genomeDir/Annotation/genes.gtf"
 maxProc=8
 
 # 1. determine mate length
-if [[ -z $mateLength ]]
+currentDate=$(date +"%Y-%m-%d %X")
+echo -ne "$currentDate: determining mate length..."
+if [[ ! -z "$dirData" ]]
 then
-    currentDate=$(date +"%Y-%m-%d %X")
-    echo -ne "$currentDate: determining mate length..."
-    if [[ ! -z "$dirData" ]]
-    then
-	if $compress
-	then
-	    file=$(find $dirData -name "*.dsrc" | head -n 1)
-	    mateLength=$($bin/dsrc-2.0.2/dsrc d -s -t$maxProc $file | \
-			     head -n 4000 | \
-			     awk 'NR%2==0 {print length($1)}' | \
-			     sort -rn | \
-			     head -n 1)
-	else
-	    file=$(find $dirData -name "*.fq.gz" | head -n 1)
-	    mateLength=$(zcat $file | \
-			     head -n 4000 | \
-			     awk 'NR%2==0 {print length($1)}' | \
-			     sort -rn | \
-			     head -n 1)
-	fi
-        # echo $mateLength
-    fi
-    echo -ne "done\n"
+    file=$(find $dirData -name "*.fq.gz" | head -n 1)
+    mateLength=$(zcat $file | \
+	head -n 4000 | \
+	awk 'NR%2==0 {print length($1)}' | \
+	sort -rn | \
+	head -n 1)
 fi
+echo -ne "done\n"
+
 genomeDir="$genomeDir/ggOverhang$(($mateLength -1))"
 
 # 2. Generating genomes for alignment with 'STAR'
