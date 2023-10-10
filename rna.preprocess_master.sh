@@ -7,7 +7,7 @@ email="slim.fourati@northwestern.edu"
 pairEnd=false
 isoform=false
 genome=GRCh38
-acceptedGenome=("GRCh38")
+acceptedGenome=("GRCh38" "GRCm39")
 
 while getopts :d:e:g:pih option
 do

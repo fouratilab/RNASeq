@@ -27,7 +27,7 @@ bash rna.preprocessing_master.sh -d {raw_directory}
 arguments:  
 d=[d]irectory with raw data (directory; required)  
 g=reference [g]enome  
-    accepted values: GRCh38
+    accepted values: GRCh38, GRCm39  
 p=[p]air-end sequencing files  
     if arugment -p is not given, single-end sequencing files are  
     expected

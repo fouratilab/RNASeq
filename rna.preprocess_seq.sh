@@ -186,7 +186,23 @@ then
 	-o $sample.sorted.bam \
 	${sample}_starAligned.out.bam &>/dev/null
     # delete unsorted bam
-    rm ${sample}_starAligned.out.bam
+    #rm ${sample}_starAligned.out.bam
+    echo "done"
+fi
+
+# 10. Order BAM file by position
+flag=true
+if $flag
+then
+    currentDate=$(date +"%Y-%m-%d %X")
+    echo -ne "$currentDate: sorting bam file by name..."
+    samtools sort \
+	-n \
+	-@ $maxProc \
+	-o $sample.name_sorted.bam \
+	${sample}_starAligned.out.bam &>/dev/null
+    # delete unsorted bam
+    #rm ${sample}_starAligned.out.bam
     echo "done"
 fi
 
@@ -253,7 +269,7 @@ then
         --idattr=gene_id \
 	--format=bam \
         --quiet \
-        $sample.sorted.bam \
+        $sample.name_sorted.bam \
         $gtfFile \
         > ${sample}_counts_gene
     if $isoform
@@ -264,7 +280,7 @@ then
             --idattr=transcript_id \
 	    --format=bam \
             --quiet \
-            $sample.sorted.bam \
+            $sample.name_sorted.bam \
             $gtfFile \
             > ${sample}_counts_transcript
 	htseq-count \
@@ -273,7 +289,7 @@ then
             --idattr=exon_id \
 	    --format=bam \
             --quiet \
-            $sample.sorted.bam \
+            $sample.name_sorted.bam \
             $gtfFile \
             > ${sample}_counts_exon
     fi
